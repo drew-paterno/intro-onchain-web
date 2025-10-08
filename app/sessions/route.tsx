@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createPublicClient, createWalletClient, encodeFunctionData, Hex, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts'
 import { baseSepolia } from 'viem/chains';
-import { AttendanceAbi, attendenceContract } from '@/app/lib/Attendance';
+import { AttendanceAbi, attendanceContract } from '@/app/lib/Attendance';
 
 export function parseSession(result?: [number, number, bigint] | readonly [number, number, bigint]) {
   if (!result) return undefined
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     // Send a transaction to create a new session
     // Writes Attendance.createSession(start, end)
     const transactionHash = await walletClient.sendTransaction({
-      to: attendenceContract,
+      to: attendanceContract,
       data: encodeFunctionData({
         abi: AttendanceAbi,
         functionName: "createSession",
@@ -70,7 +70,7 @@ export async function GET(req: Request) {
     // Get the total number of sessions created by the contract
     // Reads Attendance.totalSessions()
     const totalSessionsRes = await publicClient.readContract({
-      address: attendenceContract,
+      address: attendanceContract,
       abi: AttendanceAbi,
       functionName: 'totalSessions',
       args: []
@@ -87,7 +87,7 @@ export async function GET(req: Request) {
     const sessionsRes = await publicClient.multicall({
       contracts: sessionIds.map(sessionId => ({
         abi: AttendanceAbi, 
-        address: attendenceContract, 
+        address: attendanceContract, 
         functionName: "sessions", 
         args: [sessionId]
       }))

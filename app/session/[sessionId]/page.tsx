@@ -16,7 +16,7 @@ import {
 } from '@coinbase/onchainkit/identity';
 import { Transaction, TransactionButton, TransactionSponsor, TransactionStatus, TransactionStatusAction, TransactionStatusLabel } from "@coinbase/onchainkit/transaction"
 import { encodeFunctionData, Hex } from 'viem';
-import { AttendanceAbi, attendenceContract } from '@/app/lib/Attendance';
+import { AttendanceAbi, attendanceContract } from '@/app/lib/Attendance';
 import { useAccount, useChainId, useReadContract, useSwitchChain } from 'wagmi';
 import { baseSepolia } from 'viem/chains';
 import { parseSession } from '@/app/sessions/route';
@@ -29,14 +29,14 @@ export default function App({ params }: {params: {sessionId: string}}) {
     // state for querying totalSessions
     const {data: totalSessions, isLoading} = useReadContract({
         abi: AttendanceAbi, 
-        address: attendenceContract, 
+        address: attendanceContract, 
         functionName: "totalSessions"
     })
 
     // state for querying a session's data
     const {data: sessionRaw} = useReadContract({
         abi: AttendanceAbi,
-        address: attendenceContract,
+        address: attendanceContract,
         functionName: "sessions",
         args: [BigInt(params.sessionId)]
     })
@@ -44,7 +44,7 @@ export default function App({ params }: {params: {sessionId: string}}) {
     // state for querying if an account has attended a session
     const {data: hasAttended} = useReadContract({
         abi: AttendanceAbi, 
-        address: attendenceContract, 
+        address: attendanceContract, 
         functionName: "hasAttended", 
         args: [BigInt(params.sessionId), account.address as Hex]
     })
@@ -115,7 +115,7 @@ export default function App({ params }: {params: {sessionId: string}}) {
                     {/* If user has not attended session, display attend session button */}
                     {!hasAttended ? (
                         <Transaction calls={[{
-                            to: attendenceContract, 
+                            to: attendanceContract, 
                             data: encodeFunctionData({
                                 abi: AttendanceAbi, 
                                 functionName: "attendSession", 
