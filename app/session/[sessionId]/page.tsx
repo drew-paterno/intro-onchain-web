@@ -20,6 +20,7 @@ import { AttendanceAbi, attendenceContract } from '@/app/lib/Attendance';
 import { useAccount, useChainId, useReadContract, useSwitchChain } from 'wagmi';
 import { baseSepolia } from 'viem/chains';
 import { parseSession } from '@/app/sessions/route';
+import { useEffect } from 'react';
 
 export default function App({ params }: {params: {sessionId: string}}) {
     const account = useAccount()
@@ -51,9 +52,11 @@ export default function App({ params }: {params: {sessionId: string}}) {
 
     const chainId = useChainId()
     const {switchChain} = useSwitchChain()
-    if (chainId && chainId != baseSepolia.id) {
-        switchChain({chainId: baseSepolia.id})
-    }
+    useEffect(() => {
+        if (chainId && chainId !== baseSepolia.id) {
+            switchChain({ chainId: baseSepolia.id })
+        }
+    }, [chainId, switchChain])
 
     const session = parseSession(sessionRaw)
     console.log({session})
