@@ -4,7 +4,6 @@ import { Address, Avatar, EthBalance, Identity, Name } from "@coinbase/onchainki
 import { ConnectWallet, Wallet, WalletDropdown, WalletDropdownDisconnect, WalletDropdownLink } from "@coinbase/onchainkit/wallet";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useAccount } from "wagmi";
 
 async function fetchSessions() {
   const response = await fetch("/sessions");
@@ -15,7 +14,6 @@ async function fetchSessions() {
 }
 
 export default function App() {
-  const account = useAccount()
   const { data, isLoading } = useQuery({
     queryKey: ["sessions"],
     queryFn: fetchSessions,
@@ -49,8 +47,10 @@ export default function App() {
           </Wallet>
       </div>
       {!data?.sessions?.length ? (
+        // If no sessions have been created, display message
         <div className="text-center">No sessions created. <br /> Call POST /sessions or transact directly onchain. </div>
       ) : (
+        // If sessions have been created, display list of sessions
         <ul className="w-1/4 text-center flex flex-col space-y-4">
           {data?.sessions?.map((session: any) => (
             <Link href={`/session/${session.sessionId}`} className="hover:underline">Session #{session.sessionId}</Link>
