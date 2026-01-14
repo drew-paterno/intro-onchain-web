@@ -4,6 +4,8 @@ import { Address, Avatar, EthBalance, Identity, Name } from "@coinbase/onchainki
 import { ConnectWallet, Wallet, WalletDropdown, WalletDropdownDisconnect, WalletDropdownLink } from "@coinbase/onchainkit/wallet";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useAccount, useReadContract } from 'wagmi';
+import { AttendanceAbi, attendanceContract } from '@/app/lib/Attendance';
 
 async function fetchSessions() {
   const response = await fetch("/sessions");
@@ -14,10 +16,19 @@ async function fetchSessions() {
 }
 
 export default function App() {
+  const account = useAccount()
+
   const { data, isLoading } = useQuery({
     queryKey: ["sessions"],
     queryFn: fetchSessions,
   });
+
+  // state for querying totalAttendence
+  const { data: totalSessions } = useReadContract({
+      abi: AttendanceAbi, 
+      address: attendanceContract, 
+      functionName: "totalSessions"
+  })
 
   return isLoading ? (<></>) : (
     <div className="flex flex-col items-center justify-center min-h-screen font-sans dark:bg-background dark:text-white bg-white text-black">
@@ -51,12 +62,16 @@ export default function App() {
         <div className="text-center">No sessions created. <br /> Call POST /sessions or transact directly onchain. </div>
       ) : (
         // If sessions have been created, display list of sessions
-        <ul className="w-1/4 text-center flex flex-col space-y-4">
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {data?.sessions?.map((session: any) => (
-            <Link key={session.sessionId} href={`/session/${session.sessionId}`} className="hover:underline">Session #{session.sessionId}</Link>
-          ))}
-        </ul>
+        <>
+        
+          <div className="text-center">There are {totalSessions?.toString() ?? '0'} total sessions.</div><br/>
+          <ul className="w-1/4 text-center flex flex-col space-y-4">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {data?.sessions?.map((session: any) => (
+              <Link key={session.sessionId} href={`/session/${session.sessionId}`} className="hover:underline">Session #{session.sessionId}</Link>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );
