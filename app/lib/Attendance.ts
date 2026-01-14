@@ -1,7 +1,7 @@
 import { Address } from "viem";
 
 export const attendanceContract =
-  "0x864cdCc0A0335e37359d04712436FB5369871631" as Address;
+  "0xa2b10CA3641441e1638c971E31CA000Cd1fEad50" as Address;
 export const AttendanceAbi = [
   {
     inputs: [{ internalType: "address", name: "owner_", type: "address" }],
