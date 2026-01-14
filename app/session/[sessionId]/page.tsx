@@ -49,6 +49,16 @@ export default function App({ params }: {params: {sessionId: string}}) {
         args: [BigInt(params.sessionId), account.address as Hex]
     })
 
+    // state for querying totalAttendence
+    const {data: totalAttended} = useReadContract({
+        abi: AttendanceAbi, 
+        address: attendanceContract, 
+        functionName: "totalAttendence",
+        args: [account.address as Hex]
+    })
+
+    console.log(totalAttended)
+
     // state for wallet's currently connected chain
     const chainId = useChainId()
 
@@ -61,7 +71,7 @@ export default function App({ params }: {params: {sessionId: string}}) {
     }, [chainId, switchChain])
 
     const session = parseSession(sessionRaw)
-    console.log({session})
+    // console.log({session})
 
     return isLoading ? (
         <></>
@@ -112,27 +122,28 @@ export default function App({ params }: {params: {sessionId: string}}) {
                         </Wallet>
                     </div>
                     <div className='w-1/4'>
-                    {/* If user has not attended session, display attend session button */}
-                    {!hasAttended ? (
-                        <Transaction calls={[{
-                            to: attendanceContract, 
-                            data: encodeFunctionData({
-                                abi: AttendanceAbi, 
-                                functionName: "attendSession", 
-                                args: [BigInt(params.sessionId)]
-                            })
-                        }]}>
-                            <TransactionButton text={"Attend"} />
-                            <TransactionSponsor />
-                            <TransactionStatus>
-                                <TransactionStatusLabel />
-                                <TransactionStatusAction />
-                            </TransactionStatus>
-                        </Transaction>  
-                    ) : (
-                        // If user has attended session, display message
-                        <div className='text-center'>You have already attended this session.</div>
-                    )}
+                        {/* If user has not attended session, display attend session button */}
+                        {!hasAttended ? (
+                            <Transaction calls={[{
+                                to: attendanceContract, 
+                                data: encodeFunctionData({
+                                    abi: AttendanceAbi, 
+                                    functionName: "attendSession", 
+                                    args: [BigInt(params.sessionId)]
+                                })
+                            }]}>
+                                <TransactionButton text={"Attend"} />
+                                <TransactionSponsor />
+                                <TransactionStatus>
+                                    <TransactionStatusLabel />
+                                    <TransactionStatusAction />
+                                </TransactionStatus>
+                            </Transaction>  
+                        ) : (
+                            // If user has attended session, display message
+                            <div className='text-center'>You have already attended this session.</div>
+                        )}
+                        <div className='text-center'>You have attended {totalAttended?.toString() ?? '0'} session(s).</div>
                     </div>
                 </>
             )}
